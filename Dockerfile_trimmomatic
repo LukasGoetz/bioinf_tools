@@ -1,0 +1,19 @@
+FROM alpine:3.13.3
+
+ENV TRIMMOMATIC_VERSION 0.39
+ENV TRIMMOMATIC_REPO https://github.com/usadellab/Trimmomatic/files/5854859
+ENV TRIMMOMATIC_ARCHIVE ${TRIMMOMATIC_REPO}/Trimmomatic-${TRIMMOMATIC_VERSION}.zip
+
+WORKDIR /opt
+RUN apk update && \
+    apk add --no-cache openjdk8-jre~=8.275.01-r0 ca-certificates~=20191127-r5 \
+                       wget~=1.21.1-r1 && \
+    wget --progress=dot:giga --quiet ${TRIMMOMATIC_ARCHIVE} -O trim.zip && \
+    unzip -o trim.zip && rm trim.zip && \
+    mv Trimmomatic-${TRIMMOMATIC_VERSION} trimmomatic && cd trimmomatic && \
+    mv trimmomatic-${TRIMMOMATIC_VERSION}.jar trimmomatic.jar && \
+    apk del ca-certificates
+
+LABEL org.opencontainers.image.authors="Lukas Goetz" \
+      org.opencontainers.image.version=${TRIMMOMATIC_VERSION} \
+      org.opencontainers.image.title="trimmomatic"

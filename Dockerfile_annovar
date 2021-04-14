@@ -1,0 +1,16 @@
+FROM perl:5.32.1-slim
+
+ENV ANNOVAR_VERSION 1.0.0
+ENV ANNOVAR_REPO http://www.openbioinformatics.org/annovar/download/0wgxR2rIVP
+ENV ANNOVAR_ARCHIVE ${ANNOVAR_REPO}/annovar.latest.tar.gz
+
+WORKDIR /opt
+RUN apt update && \
+    apt install -y wget && \
+    wget --progress=dot:giga --quiet ${ANNOVAR_ARCHIVE} -O annovar.tar.gz && \
+    tar -xzvf annovar.tar.gz && \
+    rm -r /opt/annovar/humandb/* /opt/annovar.tar.gz
+
+LABEL org.opencontainers.image.authors="Lukas Goetz" \
+      org.opencontainers.image.version=${ANNOVAR_VERSION} \
+      org.opencontainers.image.title="annovar"

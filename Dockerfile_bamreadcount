@@ -1,0 +1,24 @@
+FROM alpine:3.13.3
+
+ENV BAMREADCOUNT_VERSION 0.8.0
+ENV BAMREADCOUNT_REPO https://github.com/genome/bam-readcount/archive/refs/tags
+ENV BAMREADCOUNT_ARCHIVE ${BAMREADCOUNT_REPO}/v${BAMREADCOUNT_VERSION}.tar.gz
+
+WORKDIR /opt
+RUN apk update && \
+    apk add --no-cache build-base~=0.5-r2 zlib-dev~=1.2.11-r3 bzip2-dev~=1.0.8-r1 \
+                       libgcc~=10.2.1_pre1-r3 libstdc++~=10.2.1_pre1-r3 \
+                       xz-dev~=5.2.5-r0 ncurses-dev~=6.2_p20210109-r0 \
+                       ca-certificates~=20191127-r5 wget~=1.21.1-r1 \
+                       cmake~=3.18.4-r1	perl~=5.32.0-r0	&& \
+    wget --progress=dot:giga --quiet ${BAMREADCOUNT_ARCHIVE} -O bamreadcount.tar.gz && \
+    tar -xzvf bamreadcount.tar.gz && \
+    cd /opt/bam-readcount-${BAMREADCOUNT_VERSION} && \
+    mkdir new_build && cmake -S . -B new_build && \
+    cd new_build && make && mv bin/bam-readcount /bin && \
+    rm -rf /opt/bam* && \
+    apk del build-base zlib-dev ca-certificates perl
+
+LABEL org.opencontainers.image.authors="Lukas Goetz" \
+      org.opencontainers.image.version=${BAMREADCOUNT_VERSION} \
+      org.opencontainers.image.title="bamreadcount"

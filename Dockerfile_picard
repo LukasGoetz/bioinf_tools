@@ -1,0 +1,17 @@
+FROM alpine:3.13.3
+
+ENV PICARD_VERSION 2.25.1
+ENV PICARD_REPO https://github.com/broadinstitute/picard/releases/download
+ENV PICARD_ARCHIVE ${PICARD_REPO}/${PICARD_VERSION}/picard.jar
+
+WORKDIR /opt
+RUN apk update && \
+    apk add --no-cache openjdk10-jre~=10.0.2_p13-r2 ca-certificates~=20191127-r5 \
+                       wget~=1.21.1-r1 gcompat~=1.0.0-r1 && \
+    mkdir picard && \
+    wget --progress=dot:giga --quiet ${PICARD_ARCHIVE} -O picard/picard.jar && \
+    apk del ca-certificates
+
+LABEL org.opencontainers.image.authors="Lukas Goetz" \
+      org.opencontainers.image.version=${PICARD_VERSION} \
+      org.opencontainers.image.title="picard"

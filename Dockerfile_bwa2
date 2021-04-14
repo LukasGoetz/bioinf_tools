@@ -1,0 +1,22 @@
+FROM alpine:3.13.3
+
+ENV BWA2_VERSION 2.2.1
+ENV BWA2_REPO1 https://github.com/bwa-mem2/bwa-mem2/releases/download
+ENV BWA2_REPO2 ${BWA2_REPO1}/v${BWA2_VERSION}/Source_code_including_submodules.tar.gz
+
+WORKDIR /opt
+RUN apk update && \
+    apk add --no-cache build-base~=0.5-r2 zlib-dev~=1.2.11-r3 bzip2-dev~=1.0.8-r1 \
+                       libgcc~=10.2.1_pre1-r3 libstdc++~=10.2.1_pre1-r3 \
+                       xz-dev~=5.2.5-r0 ncurses-dev~=6.2_p20210109-r0 \
+                       ca-certificates~=20191127-r5 wget~=1.21.1-r1 && \
+    wget --progress=dot:giga --quiet ${BWA2_REPO2} && \
+    tar -xzvf Source_code_including_submodules.tar.gz && \
+    cd /opt/bwa-mem2-${BWA2_VERSION} && \
+    make && mv bwa-mem2* /bin/ && \
+    rm -rf Source_code_including_submodules.tar.gz /opt/bwa* && \
+    apk del build-base zlib-dev ca-certificates
+
+LABEL org.opencontainers.image.authors="Lukas Goetz" \
+      org.opencontainers.image.version=${BWA2_VERSION} \
+      org.opencontainers.image.title="bwa2"

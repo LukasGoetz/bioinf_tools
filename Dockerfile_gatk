@@ -1,0 +1,18 @@
+FROM alpine:3.13.3
+
+ENV GATK_VERSION 3.8
+ENV GATK_REPO storage.googleapis.com/gatk-software/package-archive/gatk
+ENV GATK_ARCHIVE ${GATK_REPO}/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef.tar.bz2
+
+WORKDIR /opt
+RUN apk update && \
+    apk add --no-cache openjdk8-jre~=8.275.01-r0 ca-certificates~=20191127-r5 \
+                       wget~=1.21.1-r1 && \
+    wget --progress=dot:giga --quiet ${GATK_ARCHIVE} -O gatk.tar.bz2 && \
+    tar -xjvf gatk.tar.bz2 && rm gatk.tar.bz2 && \
+    mv GenomeAnalysisTK*/ gatk/ && \
+    apk del ca-certificates
+
+LABEL org.opencontainers.image.authors="Lukas Goetz" \
+      org.opencontainers.image.version=${GATK_VERSION} \
+      org.opencontainers.image.title="gatk"

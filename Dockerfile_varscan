@@ -1,0 +1,17 @@
+FROM alpine:3.13.3
+
+ENV VARSCAN_VERSION 2.4.4
+ENV VARSCAN_REPO https://github.com/dkoboldt/varscan/raw/master
+ENV VARSCAN_ARCHIVE ${VARSCAN_REPO}/VarScan.v${VARSCAN_VERSION}.jar
+
+WORKDIR /opt
+RUN apk update && \
+    apk add --no-cache openjdk10-jre~=10.0.2_p13-r2 ca-certificates~=20191127-r5 \
+                       wget~=1.21.1-r1 gcompat~=1.0.0-r1 && \
+    mkdir varscan && \
+    wget --progress=dot:giga --quiet ${VARSCAN_ARCHIVE} -O varscan/varscan.jar && \
+    apk del ca-certificates
+
+LABEL org.opencontainers.image.authors="Lukas Goetz" \
+      org.opencontainers.image.version=${VARSCAN_VERSION} \
+      org.opencontainers.image.title="varscan"
